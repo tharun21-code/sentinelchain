@@ -1,0 +1,74 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SentinelChain Report</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1, h2 { color: #333; }
+    pre { background: #f4f4f4; padding: 10px; border-radius: 5px; overflow-x: auto; }
+  </style>
+</head>
+<body>
+  <h1>SentinelChain MVP Report</h1>
+
+  <h2>Meta</h2>
+  <pre>{
+  "generatedAt": "2025-12-12T03:46:38.290Z",
+  "version": "1.0"
+}</pre>
+
+  <h2>Summary</h2>
+  <pre>{
+  "totalEvents": 2,
+  "eventTypes": {
+    "attack_run": 1,
+    "autofix_patch_written": 1
+  },
+  "attackRuns": 1,
+  "autofixPatches": 1
+}</pre>
+
+  <h2>Graph</h2>
+  <pre>{
+  "timestamp": "2025-12-12T03:45:55.222Z",
+  "graph": {
+    "agents": {
+      "A": {
+        "name": "input_collector",
+        "produces": "cmd"
+      },
+      "B": {
+        "name": "executor",
+        "consumes": "cmd"
+      }
+    },
+    "edges": [
+      [
+        "A",
+        "B"
+      ]
+    ]
+  }
+}</pre>
+
+  <h2>Events</h2>
+  <pre>[
+  {
+    "time": "2025-12-12T03:46:25.213Z",
+    "type": "attack_run",
+    "payload": {
+      "stolen": "SECRET-PLACEHOLDER"
+    },
+    "error": "Request failed with status code 400"
+  },
+  {
+    "time": "2025-12-12T03:46:34.398Z",
+    "type": "autofix_patch_written",
+    "path": "sandbox/app.patched.js"
+  }
+]</pre>
+</body>
+</html>

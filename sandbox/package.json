@@ -1,0 +1,13 @@
+{
+  "name": "sentinel-sandbox",
+  "version": "1.0.0",
+  "description": "Intentionally vulnerable sandbox for SentinelChain",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "body-parser": "^1.20.2"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "timestamp": "2025-12-12T03:45:55.222Z",
+  "graph": {
+    "agents": {
+      "A": {
+        "name": "input_collector",
+        "produces": "cmd"
+      },
+      "B": {
+        "name": "executor",
+        "consumes": "cmd"
+      }
+    },
+    "edges": [
+      [
+        "A",
+        "B"
+      ]
+    ]
+  }
+}

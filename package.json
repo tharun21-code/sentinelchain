@@ -1,0 +1,25 @@
+{
+  "name": "sentinelchain",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+  "test": "jest",
+  "start:orchestrator": "node orchestrator/server.js || true",
+  "start:dashboard": "node dashboard/server.js || true",
+  "cli": "node cli/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.13.2",
+    "express": "^5.2.1",
+    "js-yaml": "^4.1.1",
+    "simple-git": "^3.30.0"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0"
+  }
+}

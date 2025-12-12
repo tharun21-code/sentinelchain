@@ -1,0 +1,9 @@
+﻿node_modules/
+.env
+.DS_Store
+.vscode/
+sandbox/node_modules/
+ledger/*.json
+ledger/events.log
+AppData/
+*.log
