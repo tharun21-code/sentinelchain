@@ -1,9 +1,29 @@
-﻿node_modules/
+﻿# Node
+node_modules/
+sandbox/node_modules/
+sandbox/*.patched.js
+
+# Environment & secrets
 .env
+.env.*
+secrets/
+*.pem
+
+# OS / Editor
 .DS_Store
 .vscode/
-sandbox/node_modules/
-ledger/*.json
-ledger/events.log
 AppData/
+
+# Runtime / generated data
+ledger/
+repos/
+kestra/data/
+kestra/logs/
+kestra/plugins/
 *.log
+*.tmp
+decision.json
+
+# Misc
+coverage/
+
