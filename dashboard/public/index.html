@@ -15,15 +15,26 @@
 <body>
   <h1>SentinelChain Dashboard</h1>
 
+  <div style="margin-bottom: 20px;">
+    <input id="repoUrl" placeholder="Enter GitHub repo URL" style="width: 300px; padding: 8px; margin-right: 10px;">
+    <button onclick="importRepo()">Import Repo</button>
+  </div>
+
   <div>
+    <button onclick="runPipeline()" style="background: #007bff; color: white; font-weight: bold;">Run Full Pipeline</button>
     <button onclick="runStage('faam')">Run FAAM</button>
     <button onclick="runStage('gen_payload')">Generate Payload</button>
     <button onclick="runStage('run_attack')">Run Attack</button>
     <button onclick="runStage('autofix')">AutoFix</button>
     <button onclick="runCodeRabbit()">Request CodeRabbit Report</button>
+    <button onclick="fetchPRComments()">Fetch PR Comments</button>
+    <button id="fetchCR" onclick="fetchCodeRabbitComments()">Fetch CodeRabbit Comments</button>
     <button onclick="runStage('export_report')">Export Report</button>
     <button onclick="openReport()">Open HTML Report</button>
   </div>
+
+  <!-- CodeRabbit result display -->
+  <div id="coderabbitResult" style="white-space:pre-wrap; border:1px solid #ddd; padding:8px; margin-top:8px;"></div>
 
   <h2>Report</h2>
   <pre id="report">Loading...</pre>
@@ -96,6 +107,82 @@
       } catch (e) {
         log('Error running CodeRabbit: ' + e.message);
       }
+    }
+
+    async function fetchPRComments() {
+      try {
+        const res = await fetch('/api/fetch-pr-comments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        });
+        const result = await res.json();
+        log(`Fetch PR Comments: ${result.success ? 'Success' : 'Failed'}`);
+        if (result.stdout) log(result.stdout);
+        if (result.stderr) log('STDERR: ' + result.stderr);
+        if (result.error) log('ERROR: ' + result.error);
+        loadEvents();
+      } catch (e) {
+        log('Error fetching PR comments: ' + e.message);
+      }
+    }
+
+    async function fetchCodeRabbitComments(){
+      document.getElementById('coderabbitResult').textContent = 'Fetching...';
+      try {
+        const res = await fetch('/api/fetch-coderabbit', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({})
+        });
+        const json = await res.json();
+        if(json.ok){
+          document.getElementById('coderabbitResult').textContent = (json.stdout || json.stderr || 'No output — check ledger/events.log');
+        } else {
+          document.getElementById('coderabbitResult').textContent = 'Error: ' + (json.error || 'unknown');
+        }
+      } catch (err) {
+        document.getElementById('coderabbitResult').textContent = 'Fetch failed: ' + String(err);
+      }
+    }
+
+    function importRepo() {
+        const repoUrl = document.getElementById("repoUrl").value;
+        fetch('/api/import-repo', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ repoUrl })
+        })
+        .then(res => res.json())
+        .then(data => log("Repo import result: " + JSON.stringify(data)))
+        .catch(err => log("Import error: " + err));
+    }
+
+    async function runPipeline() {
+        log("🚀 Starting full SentinelChain pipeline...");
+        fetch('/api/run-pipeline', {
+            method: "POST"
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.ok) {
+                log("✅ Pipeline completed successfully!");
+                log("📋 Pipeline Output:");
+                log(data.output || "No detailed output available");
+
+                // Check for PR URL in the output
+                const prMatch = data.output.match(/PR URL: (https:\/\/github\.com\/[^\s]+)/);
+                if (prMatch) {
+                    log(`🔗 GitHub PR Created: ${prMatch[1]}`);
+                }
+            } else {
+                log("❌ Pipeline failed:");
+                log(data.error || JSON.stringify(data));
+            }
+            loadReport();
+            loadEvents();
+        })
+        .catch(err => log("❌ Pipeline error: " + err));
     }
 
     function openReport() {

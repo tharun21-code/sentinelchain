@@ -1,0 +1,78 @@
+id: sentinelchain_pipeline
+namespace: dev.sentinelchain
+
+description: SentinelChain automated security pipeline orchestration
+
+inputs:
+  - id: trigger_type
+    type: STRING
+    defaults: manual
+
+triggers:
+  - id: webhook
+    type: io.kestra.core.models.triggers.types.Webhook
+    key: sentinelchain-trigger
+
+tasks:
+  - id: analyze_and_decide
+    type: io.kestra.core.tasks.scripts.Shell
+    description: Run SentinelChain analysis and decision agent
+    commands:
+      - node agents/kestra_agent.js
+    outputFiles:
+      - decision.json
+
+  - id: parse_decision
+    type: io.kestra.core.tasks.scripts.Shell
+    description: Parse the agent's decision output
+    commands:
+      - |
+        if [ -f decision.json ]; then
+          cat decision.json
+        else
+          echo '{"decision":"noop","reason":"No decision file found"}'
+        fi
+    outputFiles:
+      - parsed_decision.json
+
+  - id: conditional_branch
+    type: io.kestra.core.tasks.flows.Switch
+    description: Branch based on agent decision
+    value: "{{ outputs.parse_decision.stdout | jq('.decision') }}"
+    cases:
+      auto_pr:
+        - id: run_full_pipeline
+          type: io.kestra.core.tasks.scripts.Shell
+          description: Execute complete SentinelChain pipeline
+          commands:
+            - node orchestrator/run_pipeline.js
+          dependsOn:
+            - parse_decision
+
+      monitor:
+        - id: notify_team
+          type: io.kestra.core.tasks.scripts.Shell
+          description: Send monitoring notification
+          commands:
+            - |
+              echo '{"time":"'$(date -Iseconds)'","type":"kestra_monitor_notification","message":"SentinelChain monitoring triggered","workflow_id":"{{flow.id}}","execution_id":"{{execution.id}}"}' >> ledger/events.log
+          dependsOn:
+            - parse_decision
+
+      noop:
+        - id: log_noop
+          type: io.kestra.core.tasks.scripts.Shell
+          description: Log no-operation decision
+          commands:
+            - |
+              echo '{"time":"'$(date -Iseconds)'","type":"kestra_noop","reason":"No action required","workflow_id":"{{flow.id}}","execution_id":"{{execution.id}}"}' >> ledger/events.log
+          dependsOn:
+            - parse_decision
+
+    defaults:
+      - id: default_action
+        type: io.kestra.core.tasks.scripts.Shell
+        description: Default action for unrecognized decisions
+        commands:
+          - |
+            echo '{"time":"'$(date -Iseconds)'","type":"kestra_unknown_decision","decision":"{{ outputs.parse_decision.stdout | jq(.decision) }}","workflow_id":"{{flow.id}}","execution_id":"{{execution.id}}"}' >> ledger/events.log

@@ -4,19 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "test": "jest",
-  "start:orchestrator": "node orchestrator/server.js || true",
-  "start:dashboard": "node dashboard/server.js || true",
-  "cli": "node cli/index.js"
+    "test": "jest",
+    "start:orchestrator": "node orchestrator/server.js || true",
+    "start:dashboard": "node dashboard/server.js || true",
+    "cli": "node cli/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "@octokit/rest": "^22.0.1",
     "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "js-yaml": "^4.1.1",
+    "jsonwebtoken": "^9.0.3",
     "simple-git": "^3.30.0"
   },
   "devDependencies": {

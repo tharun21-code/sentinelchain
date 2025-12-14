@@ -1,2 +1,0 @@
-{"time":"2025-12-12T03:46:25.213Z","type":"attack_run","payload":{"stolen":"SECRET-PLACEHOLDER"},"error":"Request failed with status code 400"}
-{"time":"2025-12-12T03:46:34.398Z","type":"autofix_patch_written","path":"sandbox/app.patched.js"}
